@@ -38,11 +38,12 @@ func execute(inputCommd string) []byte {
 
 	commd = s.Split(inputCommd, " ")
 	var out []byte
-	if len(commd) >= 1 {
+	if len(commd) > 1 {
 		out, _ = exec.Command(string(commd[0]), string(commd[1])).Output()
+		fmt.Printf("%s", out)
 	}
-	
-	fmt.Printf(commd[0] + "\n" + commd[1] + "\n")
+	out, _ = exec.Command(string(commd[0])).Output();
+	fmt.Printf("%s", out)
 	return out
 }
 
