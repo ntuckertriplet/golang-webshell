@@ -5,7 +5,8 @@ import (
 	"net/http"
 	"github.com/gorilla/mux"
 	"fmt"
-    "os/exec"
+	"os/exec"
+	s "strings"
 )
 
 var templates *template.Template
@@ -29,20 +30,20 @@ func indexPostHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	rawCommand := r.PostForm.Get("command")
 	commandOutput := execute(rawCommand)
-	fmt.Printf("%s", commandOutput)
-	http.Redirect(w, r, "/", 302)
+	fmt.Fprintf(w, string(commandOutput))
 }
 
-func execute(commd string) string {
-	out, err := exec.Command(commd).Output()
+func execute(inputCommd string) []byte {
+	var commd []string
 
-	if err != nil {
-		fmt.Printf("%s", err)
+	commd = s.Split(inputCommd, " ")
+	var out []byte
+	if len(commd) >= 1 {
+		out, _ = exec.Command(string(commd[0]), string(commd[1])).Output()
 	}
-
-	output := string(out[:])
-	fmt.Printf("%s", output)
-	return output
+	
+	fmt.Printf(commd[0] + "\n" + commd[1] + "\n")
+	return out
 }
 
 
